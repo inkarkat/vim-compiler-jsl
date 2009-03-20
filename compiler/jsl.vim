@@ -3,9 +3,8 @@
 " Maintainer:   Ingo Karkat <ingo@karkat.de>
 "
 " DEPENDENCIES:
-"  - $TOOLBOXHOME points to the base directory of the toolbox that contains the
-"    used tools. 
-"  - jsl (http://www.javascriptlint.com)
+"  - jsl (http://www.javascriptlint.com). 
+"  - jsl.cmd wrapper in this script's directory. 
 "
 " USAGE:
 "   :make
@@ -30,7 +29,10 @@ if exists(":CompilerSet") != 2		" older Vim always used :setlocal
     command -nargs=* CompilerSet setlocal <args>
 endif
 
-execute 'CompilerSet makeprg=\"\"$TOOLBOXHOME\\tools\\JavaScript\\jsl.exe\"\ -nologo\ -nofilelisting\ -nosummary\ $*\ -process\ \"%\"\"'
+" The jsl.exe wrapper script resides in this script's directory. 
+let s:scriptDir = escape( expand('<sfile>:p:h'), ' \' )
+execute 'CompilerSet makeprg=\"\"' . s:scriptDir . '\\jsl.cmd\"\ -nologo\ -nofilelisting\ -nosummary\ $*\ -process\ $*\ \"%\"\"'
+unlet s:scriptDir
 
 " sample output: 
 "C:\TEMP\jsl\jsl-test.js(9): warning: test for equality (==) mistyped as assignment (=)?
@@ -45,5 +47,11 @@ execute 'CompilerSet makeprg=\"\"$TOOLBOXHOME\\tools\\JavaScript\\jsl.exe\"\ -no
 "C:\TEMP\jsl\jsl-test.js(21): lint warning: undeclared identifier: z
 
 " Errorformat: Cp. |errorformat-javac|
-CompilerSet errorformat=%A%f(%l):\ %m,%-Z,%-C%p^,%-C%.%#
+" JavaScript Lint emits an empty line after each "pointer line". If we filter
+" this away by having the multiline pattern end with "%-Z", the error column
+" somehow is counted as a non-virtual column, which is wrong. So we let the
+" pattern end with the "pointer line", and filter away the empty line in the
+" wrapper. 
+"CompilerSet errorformat=%A%f(%l):\ %m,%-Z,%-C%p^,%-C%.%#
+CompilerSet errorformat=%A%f(%l):\ %m,%-Z%p^,%-C%.%#
 
