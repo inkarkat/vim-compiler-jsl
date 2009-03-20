@@ -20,5 +20,5 @@ if not exist "%jslConf%" (set jslConf=) else (set jslConf=-conf "%jslConf%")
 :: Wrapper for jsl.exe
 :: JavaScript Lint emits an empty line after each "pointer line". We filter this
 :: away here, because there are problems if we include this in the pattern. 
-"%TOOLBOXHOME%\tools\JavaScript\%~n0.exe" %jslConf% %* 2>&1 | sed -e "/^$/d"
+"%~n0.exe" %jslConf% %* 2>&1 | sed -e "/^$/d"
 
