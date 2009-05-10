@@ -4,12 +4,19 @@
 "
 " DEPENDENCIES:
 "  - jsl (http://www.javascriptlint.com). 
-"  - jsl.cmd wrapper in this script's directory. 
+"
+" CONFIGURATION:
+"   The optional jsl configuration must either reside in this script's directory
+"   as 'jsl.conf', or its filespec can be specified in g:jsl_config. 
 "
 " USAGE:
-"   :make
+"   :make [<jsl-args>]
 "
 " REVISION	DATE		REMARKS 
+"	002	21-Mar-2009	Doing jsl config file detection and filtering of
+"				empty error output lines inside the script;
+"				removed wrapper script. This compiler plugin now
+"				also works on Unix. 
 "	001	20-Mar-2009	file creation
 
 if exists('current_compiler')
@@ -17,21 +24,22 @@ if exists('current_compiler')
 endif
 let current_compiler = 'jsl'
 
-if ! (has('win32') || has('win64'))
-    echohl ErrorMsg
-    let v:errmsg = "FIXME: This compiler plugin is currently limited to Windows!"
-    echomsg v:errmsg
-    echohl None
-    finish
-endif
-
-if exists(":CompilerSet") != 2		" older Vim always used :setlocal
+if exists(':CompilerSet') != 2		" older Vim always used :setlocal
     command -nargs=* CompilerSet setlocal <args>
 endif
 
-" The jsl.exe wrapper script resides in this script's directory. 
-let s:scriptDir = escape( expand('<sfile>:p:h'), ' \' )
-execute 'CompilerSet makeprg=\"\"' . s:scriptDir . '\\jsl.cmd\"\ -nologo\ -nofilelisting\ -nosummary\ $*\ -process\ $*\ \"%\"\"'
+let s:scriptDir = expand('<sfile>:p:h')
+function! s:JslConfig()
+    let l:configFilespec = ''
+    if exists('g:jsl_config')
+	let l:configFilespec = g:jsl_config
+    else
+	let l:pathSeparator = (exists('+shellslash') && ! &shellslash ? '\' : '/')
+	let l:configFilespec = s:scriptDir . l:pathSeparator . 'jsl.conf'
+    endif
+    return (! empty(l:configFilespec) && filereadable(l:configFilespec) ? ' -conf "' . l:configFilespec . '"' : '')
+endfunction
+execute 'CompilerSet makeprg=jsl\ -nologo\ -nofilelisting\ -nosummary' .  escape(s:JslConfig(), ' "\') . '\ $*\ -process\ $*\ \"%\"'
 unlet s:scriptDir
 
 " sample output: 
@@ -48,10 +56,10 @@ unlet s:scriptDir
 
 " Errorformat: Cp. |errorformat-javac|
 " JavaScript Lint emits an empty line after each "pointer line". If we filter
-" this away by having the multiline pattern end with "%-Z", the error column
-" somehow is counted as a non-virtual column, which is wrong. So we let the
-" pattern end with the "pointer line", and filter away the empty line in the
-" wrapper. 
+" this away by having the multiline pattern end with "%-Z" (i.e. match an empty
+" line), the error column somehow is counted as a non-virtual column, which is
+" wrong. So we let the pattern end with the "pointer line", and filter away the
+" empty line in a separate "%-G" pattern. 
 "CompilerSet errorformat=%A%f(%l):\ %m,%-Z,%-C%p^,%-C%.%#
-CompilerSet errorformat=%A%f(%l):\ %m,%-Z%p^,%-C%.%#
+CompilerSet errorformat=%A%f(%l):\ %m,%-Z%p^,%-C%.%#,%-G
 
