@@ -10,9 +10,13 @@
 "   as 'jsl.conf', or its filespec can be specified in g:jsl_config. 
 "
 " USAGE:
-"   :make [<jsl-args>]
+"   :make [{jsl-args}]
+"
+" Copyright: (C) 2009 by Ingo Karkat
+"   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " REVISION	DATE		REMARKS 
+"   1.00.003	11-May-2009	Tested on Linux; published version. 
 "	002	21-Mar-2009	Doing jsl config file detection and filtering of
 "				empty error output lines inside the script;
 "				removed wrapper script. This compiler plugin now
@@ -63,3 +67,4 @@ unlet s:scriptDir
 "CompilerSet errorformat=%A%f(%l):\ %m,%-Z,%-C%p^,%-C%.%#
 CompilerSet errorformat=%A%f(%l):\ %m,%-Z%p^,%-C%.%#,%-G
 
+" vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
