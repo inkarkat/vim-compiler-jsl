@@ -67,4 +67,4 @@ unlet s:scriptDir
 "CompilerSet errorformat=%A%f(%l):\ %m,%-Z,%-C%p^,%-C%.%#
 CompilerSet errorformat=%A%f(%l):\ %m,%-Z%p^,%-C%.%#,%-G
 
-" vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
+" vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
