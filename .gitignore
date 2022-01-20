@@ -1,0 +1,8 @@
+*.msgout
+*.msgresult
+*.out
+*.tap
+compiler/jsl.conf
+doc/*.description
+doc/*.install
+tags
